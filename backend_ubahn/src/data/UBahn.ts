@@ -1,4 +1,4 @@
-import { Station } from "./data-calculator";
+import { Station } from "../domain/Station";
 
 export class UBahn {
   public connections: { [key: string]: Station[] };
