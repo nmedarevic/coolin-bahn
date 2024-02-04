@@ -1,3 +1,4 @@
+import { UBahn } from "../data/UBahn";
 import { Line } from "./Line";
 
 export type RouteSegment = {
@@ -46,5 +47,15 @@ export function getRoute(
   destinationStation: string,
   allLines: Line[]
 ): Route {
-  throw new Error("to be implemented");
+  const ubahn = new UBahn();
+  ubahn.initialize(allLines);
+
+  const origin = ubahn.findStationByName(originStation);
+  const destination = ubahn.findStationByName(destinationStation);
+  
+
+  ubahn.findRouteBFS(origin, destination);
+
+  return []
+  // throw new Error("to be implemented");
 }

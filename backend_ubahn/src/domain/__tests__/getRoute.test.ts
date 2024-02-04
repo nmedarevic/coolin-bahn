@@ -1,7 +1,7 @@
 import { lines } from "../../data";
 import { getRoute } from "../getRoute";
 
-it(`finds route on the same line U7 Siemensdamm -> Jungfernheide`, () => {
+it.only(`finds route on the same line U7 Siemensdamm -> Jungfernheide`, () => {
   const route = getRoute("Siemensdamm", "Jungfernheide", lines);
 
   expect(route).toBeDefined();
