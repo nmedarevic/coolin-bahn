@@ -6,4 +6,4 @@ import lines from "./lines.json";
 const ubahn = new UBahn();
 
 ubahn.initialize(lines as Line[]);
-ubahn.findRouteBFS(ubahn.findStationByName("Siemensdamm"), ubahn.findStationByName("Jungfernheide"));
+ubahn.findRouteDFS(ubahn.findStationByName("Siemensdamm"), ubahn.findStationByName("Jungfernheide"));

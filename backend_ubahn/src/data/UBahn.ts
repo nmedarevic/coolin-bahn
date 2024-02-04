@@ -99,53 +99,50 @@ export class UBahn {
     while (qqq.length) {
       const current = qqq[0];
       qqq.shift();
-      console.log('\n\n', "CURRENT", current, '\n\n');
 
       const connectingStations = this.connections[current.name];
+      
       for (const connection of connectingStations) {
         if (visited.find((s: Station) => s.name === connection.name)) {
           continue;
         }
 
         if (connection.name === end.name) {
-          console.log('FOUND', connection);
           return;
         }
 
         visited.push(connection)
         qqq.push(connection)
       }
-      // const connectedStations = 
+    } 
+  }
+
+  dfsBody(connection: Station, visited: Station[], end: Station, path: Station[] = []) {
+    const connectingStations = this.connections[connection!.name];
+    visited.push(connection);
+    path.push(connection);
+
+    for (const connection of connectingStations) {
+      if (connection.name === end.name) {
+        return
+      }
+
+      if (visited.find((s: Station) => s.name === connection.name)) {
+        continue;
+      }
+
+      this.dfsBody(connection, visited, end, path)
     }
-        // let visited = new Array(this.V);
-        // for(let i = 0; i < this.V; i++)
-        //     visited[i] = false;
-             
-        // Create a queue for BFS
-        // let queue=[];
-             
-        // // Mark the current node as visited and enqueue it
-        // visited[s]=true;
-        // queue.push(s);
-             
-        // while(queue.length>0)
-        // {
-        //     // Dequeue a vertex from queue and print it
-        //     s = queue[0];
-        //     console.log(s+" ");
-        //     queue.shift();
-                 
-        //     // Get all adjacent vertices of the dequeued
-        //     // vertex s. 
-        //     // If an adjacent has not been visited,
-        //     // then mark it visited and enqueue it
-        //     this.adj[s].forEach((adjacent,i) => { 
-        //         if(!visited[adjacent])
-        //         {
-        //             visited[adjacent]=true;
-        //             queue.push(adjacent);
-        //         }
-        //     });
-        
+  
+    path.pop();
+  }
+
+  findRouteDFS(start: Station, end: Station) {
+    const visited: Station[] = [];
+    const path: Station[] = [];
+
+    const first = this.stations.find((s: Station) => s.name === start.name);
+    visited.push(first!);
+    this.dfsBody(first!, visited, end, path)
   }
 }
