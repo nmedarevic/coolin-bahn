@@ -1,13 +1,19 @@
 import { Line } from "../domain/Line";
 import { Station } from "../domain/Station";
 
+type VisitedStation = {
+  name: string;
+  line: string
+}
 export class UBahn {
   public stations: Station[];
   public connections: { [key: string]: Station[] };
+  public lineConnections: { [key: string]: string[]};
 
   constructor() {
     this.connections = {};
     this.stations = [];
+    this.lineConnections = {};
   }
 
   findStationByName(name: string): Station {
@@ -15,6 +21,36 @@ export class UBahn {
   }
 
   initialize(lines: Line[]) {
+    this.initializeStationConnections(lines);
+    this.initializeLineConnections(lines);
+  }
+
+  private initializeLineConnections(lines: Line[]) {
+    if (Object(this.connections).length === 0) {
+      throw new Error("Initialize connections first!");
+    }
+
+    for (const line of lines) {
+      const allStations = this.stations.filter((s: Station) => s.lines.includes(line.name));
+
+      const allConections = allStations.reduce((lineConnections: string[], station: Station) => {
+        if (lineConnections.length === 0) {
+          return [...station.lines.filter((s: string) => s !== line.name)]
+        }
+
+        for (const singleStation of this.connections[station.name]) {
+          if (lineConnections.find((conn: string) => singleStation.lines.includes(conn))) {
+            lineConnections.concat(singleStation.lines);
+          }
+        }
+        return lineConnections
+      }, [])
+
+      this.lineConnections[line.name] = allConections;
+    }
+  }
+
+  private initializeStationConnections(lines: Line[]) {
     for (const line of lines) {
       for (let i = 0; i < line.stations.length; i++) {
         let station = this.stations.find((item: Station) => item.name === line.stations[i])
@@ -90,14 +126,17 @@ export class UBahn {
   findRouteBFS(start: Station, end: Station) {
     const visited: Station[] = [];
     const qqq: Station[] = [];
+    const path: Station[] = [];
 
     const first = this.stations.find((s: Station) => s.name === start.name);
 
     qqq.push(first!)
     visited.push(first!);
+    path.push(first!);
   
     while (qqq.length) {
       const current = qqq[0];
+      path.push(current);
       qqq.shift();
 
       const connectingStations = this.connections[current.name];
@@ -108,41 +147,63 @@ export class UBahn {
         }
 
         if (connection.name === end.name) {
+          path.push(connection);
           return;
         }
 
         visited.push(connection)
         qqq.push(connection)
       }
+      path.pop();
     } 
   }
 
-  dfsBody(connection: Station, visited: Station[], end: Station, path: Station[] = []) {
+  dfsBody(connection: Station, visited: VisitedStation[], end: Station, path: Station[], line: string) {
     const connectingStations = this.connections[connection!.name];
-    visited.push(connection);
+    visited.push({
+      name: connection!.name,
+      line: line
+    });
     path.push(connection);
-
-    for (const connection of connectingStations) {
-      if (connection.name === end.name) {
-        return
+  
+    for (const station of connectingStations) {
+      if (station.name === end.name) {
+        path.push(station);
+        console.log('\n\n', "FOUND!", path, '\n\n');
+        return true
       }
 
-      if (visited.find((s: Station) => s.name === connection.name)) {
-        continue;
-      }
+      for (const line of station.lines) {
+        if (visited.find((s: VisitedStation) => s.name === station.name && line === s.line)) {
+          continue;
+        }
+  
+        const result = this.dfsBody(station, visited, end, path, line)
 
-      this.dfsBody(connection, visited, end, path)
+        if (result) {
+          return true
+        }
+        
+      }  
+      
+      // path.pop();
     }
   
     path.pop();
   }
 
   findRouteDFS(start: Station, end: Station) {
-    const visited: Station[] = [];
+    const visited: VisitedStation[] = [];
     const path: Station[] = [];
 
     const first = this.stations.find((s: Station) => s.name === start.name);
-    visited.push(first!);
-    this.dfsBody(first!, visited, end, path)
+    
+    for (const line of first!.lines) {
+      visited.push({
+        name: first!.name,
+        line: line
+      });
+      this.dfsBody(first!, visited, end, path, line);
+    }
   }
 }

@@ -6,4 +6,6 @@ import lines from "./lines.json";
 const ubahn = new UBahn();
 
 ubahn.initialize(lines as Line[]);
-ubahn.findRouteDFS(ubahn.findStationByName("Siemensdamm"), ubahn.findStationByName("Jungfernheide"));
+
+// console.log('\n\n', ubahn.connections["Mehringdamm"], '\n\n');
+ubahn.findRouteDFS(ubahn.findStationByName("Kochstraße"), ubahn.findStationByName("Yorckstraße"));
