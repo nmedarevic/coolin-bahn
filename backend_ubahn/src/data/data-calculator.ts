@@ -21,14 +21,12 @@ for (const line of lines) {
         name: line.stations[i],
         lines: [line.name]
       }
-
-      stations.push(station)
     }
 
     ubahn.addStation(station);
 
     if (line.stations[i - 1]) {
-      const previousStation = stations.find((item: Station) => item.name === line.stations[i - 1])
+      const previousStation = ubahn.stations.find((item: Station) => item.name === line.stations[i - 1])
       
       if (!previousStation) {
         continue
@@ -41,4 +39,4 @@ for (const line of lines) {
 }
 
 console.log('\n\n', ubahn, '\n\n');
-console.log('\n\n', stations, '\n\n');
+console.log('\n\n', ubahn.stations, '\n\n');
