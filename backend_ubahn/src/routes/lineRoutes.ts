@@ -41,12 +41,16 @@ router.get(
       return;
     }
 
-    res.send(requestedLine);
+    const response = {
+      ...requestedLine,
+      stations: requestedLine.stations.map((station) => ubahn.stationsNameToUrl[station])
+    }
+    res.send(response);
   }
 );
 
 router.get(
-  "/:id/:station/:direction/:numberOfStations?",
+  "/:id/:station/:direction?/:numberOfStations?",
   /**
    * returns a specific line by id, e.g. `GET /lines/U8`
    */
@@ -66,24 +70,19 @@ router.get(
 
     const stationIndex = requestedLine.stations.findIndex((station) => station === realName);  
 
-    let stations: string[] = []
+    let stations: string[] = requestedLine.stations.map((station) => ubahn.stationsNameToUrl[station])
     
     if (requestedDirection === Direction.Forward) {
-      stations = requestedLine.stations.slice(stationIndex, stationIndex + requestedNumberOfStations);
+      stations = stations.slice(stationIndex, stationIndex + requestedNumberOfStations);
     }
 
     if (requestedDirection === Direction.Backward) {
       const startOfSlice = stationIndex - requestedNumberOfStations < 0 ? 0 : stationIndex - requestedNumberOfStations
 
-      stations = requestedLine.stations.slice(startOfSlice, stationIndex);
+      stations = stations.slice(startOfSlice, stationIndex);
     }
 
-    const response = {
-      ...requestedLine,
-      stations
-    }
-
-    res.send(response);
+    res.send(stations);
   }
 );
 
