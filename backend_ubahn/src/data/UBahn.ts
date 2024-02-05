@@ -1,4 +1,5 @@
 import { Line } from "../domain/Line";
+import slugify from "slugify"
 import { Station } from "../domain/Station";
 
 type VisitedStation = {
@@ -7,13 +8,15 @@ type VisitedStation = {
 }
 export class UBahn {
   public stations: Station[];
+  public stationsUrlToName: { [key: string]: string};
+  public stationsNameToUrl: { [key: string]: string};
   public connections: { [key: string]: Station[] };
-  public lineConnections: { [key: string]: string[] };
 
   constructor() {
     this.connections = {};
     this.stations = [];
-    this.lineConnections = {};
+    this.stationsNameToUrl = {}
+    this.stationsUrlToName = {}
   }
 
   findStationByName(name: string): Station {
@@ -22,31 +25,13 @@ export class UBahn {
 
   initialize(lines: Line[]) {
     this.initializeStationConnections(lines);
-    this.initializeLineConnections(lines);
+    this.initializeUrlEncodedStatations();
   }
 
-  private initializeLineConnections(lines: Line[]) {
-    if (Object(this.connections).length === 0) {
-      throw new Error("Initialize connections first!");
-    }
-
-    for (const line of lines) {
-      const allStations = this.stations.filter((s: Station) => s.lines.includes(line.name));
-
-      const allConections = allStations.reduce((lineConnections: string[], station: Station) => {
-        if (lineConnections.length === 0) {
-          return [...station.lines.filter((s: string) => s !== line.name)]
-        }
-
-        for (const singleStation of this.connections[station.name]) {
-          if (lineConnections.find((conn: string) => singleStation.lines.includes(conn))) {
-            lineConnections.concat(singleStation.lines);
-          }
-        }
-        return lineConnections
-      }, [])
-
-      this.lineConnections[line.name] = allConections;
+  private initializeUrlEncodedStatations() {
+    for (const station of this.stations) {
+      this.stationsUrlToName[slugify(station.name)] = station.name;
+      this.stationsNameToUrl[station.name] = slugify(station.name);
     }
   }
 
