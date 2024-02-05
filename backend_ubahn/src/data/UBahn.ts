@@ -125,13 +125,13 @@ export class UBahn {
 
   findRouteBFS(start: Station, end: Station) {
     const visited: VisitedStation[] = [];
-    const qqq: VisitedStation[] = [];
+    const visitQueue: VisitedStation[] = [];
     const path: Station[] = [];
 
     const first = this.stations.find((s: Station) => s.name === start.name);
 
     for (const line of first!.lines) {
-      qqq.push({
+      visitQueue.push({
         name: first!.name,
         line: line
       });
@@ -140,8 +140,8 @@ export class UBahn {
     visited.push({ name: first!.name, line: first!.lines[0] });
     path.push(first!);
 
-    while (qqq.length) {
-      const current = qqq[0];
+    while (visitQueue.length) {
+      const current = visitQueue[0];
       
       if (path.length >= 1) {
         const station = this.stations.find((s: Station) => s.name === current.name)!
@@ -153,7 +153,7 @@ export class UBahn {
         }
       }
 
-      qqq.shift();
+      visitQueue.shift();
 
       const connectingStations = this.connections[current.name];
 
@@ -176,13 +176,13 @@ export class UBahn {
       for (const p of sameLinePaths) {
         if (!visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
           visited.push(p)
-          qqq.push(p);
+          visitQueue.push(p);
         }
       }
       for (const p of otherLinePaths) {
         if (!visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
           visited.push(p)
-          qqq.push(p);
+          visitQueue.push(p);
         }
       }
 
