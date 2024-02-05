@@ -142,12 +142,12 @@ export class UBahn {
 
     while (visitQueue.length) {
       const current = visitQueue[0];
-      
+
       if (path.length >= 1) {
         const station = this.stations.find((s: Station) => s.name === current.name)!
         const previousInPath = path[path.length - 1];
         const isConnectedWithPrevious = this.connections[previousInPath.name].find((item: Station) => item.name === station.name)
-        
+
         if (isConnectedWithPrevious) {
           path.push(station);
         }
@@ -167,23 +167,25 @@ export class UBahn {
       }, [])
 
       const sameLinePaths = allPaths.filter((path: VisitedStation) => path.line === current.line).filter((vs: VisitedStation) => (
-        !visited.find((vtd: VisitedStation) => (vtd.name === vs.name )
+        !visited.find((vtd: VisitedStation) => (vtd.name === vs.name)
         )));
       const otherLinePaths = allPaths.filter((vs: VisitedStation) => vs.line !== current.line).filter((vs: VisitedStation) => (
-        !visited.find((vtd: VisitedStation) => (vtd.name === vs.name )
-      )));
+        !visited.find((vtd: VisitedStation) => (vtd.name === vs.name)
+        )));
 
       for (const p of sameLinePaths) {
-        if (!visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
-          visited.push(p)
-          visitQueue.push(p);
+        if (visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
+          continue;
         }
+        visited.push(p)
+        visitQueue.push(p);
       }
       for (const p of otherLinePaths) {
-        if (!visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
-          visited.push(p)
-          visitQueue.push(p);
+        if (visited.find((s: VisitedStation) => s.name === p.name && s.line === p.line)) {
+          continue
         }
+        visited.push(p)
+        visitQueue.push(p);
       }
 
       if (current.name === end.name) {
