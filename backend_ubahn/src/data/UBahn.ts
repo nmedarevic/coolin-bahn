@@ -55,8 +55,8 @@ export class UBahn {
 
         this.addStation(station);
 
-        if (line.stations[i - 1]) {
-          const previousStation = this.stations.find((item: Station) => item.name === line.stations[i - 1])
+        if (line.stations[i]) {
+          const previousStation = this.stations.find((item: Station) => item.name === line.stations[i])
 
           if (!previousStation) {
             continue
