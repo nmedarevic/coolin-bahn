@@ -82,7 +82,10 @@ router.get(
       stations = stations.slice(startOfSlice, stationIndex);
     }
 
-    res.send(stations);
+    res.send(stations.map((station: string) => ({
+      name: station,
+      connections: ubahn.connections[station]
+    })));
   }
 );
 
