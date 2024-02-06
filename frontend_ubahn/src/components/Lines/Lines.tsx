@@ -10,20 +10,19 @@ import styles from "./Lines.module.scss"
 export default function Lines({
   currentLine,
   lines,
-  onStationSelect,
-}: { lines: Line[]; onStationSelect: (stationName: string) => void; currentLine: string | null  }) {
+  onLineSelect,
+}: { lines: Line[]; onLineSelect?: (stationName: string) => void; currentLine?: string | null  }) {
   return (
     <>
       {lines.length > 0 && (
-        <div>
-          <h1>Berlin U-Bahn lines</h1>
+        
           <div className={styles.linesWrapper} style={{ fontSize: 10 }}>
             {lines.map((line) => (
               <div className={classNames(styles.line, {
                 isFocused: line.name === currentLine
-              })} style={{ backgroundColor: line.color }} onClick={() => onStationSelect(line.name)}>{line.name}</div>
+              })} style={{ backgroundColor: line.color }} onClick={() => onLineSelect && onLineSelect(line.name)}>{line.name}</div>
             ))}
-          </div>
+        
         </div>
       )}
     </>
